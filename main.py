@@ -3,8 +3,10 @@ import time
 import random
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from x402.fastapi import x402PaymentMiddleware
-from x402.mechanisms.evm.exact import ExactEvmServerScheme
+from x402.server import x402ResourceServer
+from x402.http.facilitator_client import HTTPFacilitatorClient, FacilitatorConfig
+from x402.mechanisms.evm.exact import register_exact_evm_server
+from x402.http.middleware.fastapi import PaymentMiddlewareASGI
 
 load_dotenv()
 
@@ -17,6 +19,12 @@ app = FastAPI(
     description="Multi-tier real-time market intelligence for autonomous agents via x402 micropayments on Base.",
     version="1.0.0"
 )
+
+# Initialize Facilitator Client & Resource Server
+facilitator_config = FacilitatorConfig(url=FACILITATOR)
+facilitator_client = HTTPFacilitatorClient(facilitator_config)
+resource_server = x402ResourceServer(facilitator_client)
+register_exact_evm_server(resource_server)
 
 payment_routes = {
     # Tier 1: $0.02 USDC (20,000 atomic units)
@@ -43,9 +51,9 @@ payment_routes = {
 }
 
 app.add_middleware(
-    x402PaymentMiddleware,
+    PaymentMiddlewareASGI,
     routes=payment_routes,
-    facilitator_url=FACILITATOR
+    server=resource_server
 )
 
 @app.get("/")
