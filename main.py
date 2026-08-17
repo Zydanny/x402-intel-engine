@@ -27,25 +27,34 @@ resource_server = x402ResourceServer(facilitator_client)
 register_exact_evm_server(resource_server)
 
 payment_routes = {
-    # Tier 1: $0.02 USDC (20,000 atomic units)
-    "^/v1/intel/pulse/.*$": {
-        "network": NETWORK,
-        "amount": "20000",
-        "payTo": RECEIVER,
+    # Tier 1: $0.02
+    "GET /v1/intel/pulse/*": {
+        "accepts": {
+            "scheme": "exact",
+            "payTo": RECEIVER,
+            "price": "$0.02",
+            "network": NETWORK,
+        },
         "description": "Tier 1: 5m Momentum and Volume Pulse"
     },
-    # Tier 2: $0.05 USDC (50,000 atomic units)
-    "^/v1/intel/orderbook/.*$": {
-        "network": NETWORK,
-        "amount": "50000",
-        "payTo": RECEIVER,
+    # Tier 2: $0.05
+    "GET /v1/intel/orderbook/*": {
+        "accepts": {
+            "scheme": "exact",
+            "payTo": RECEIVER,
+            "price": "$0.05",
+            "network": NETWORK,
+        },
         "description": "Tier 2: Orderbook Depth and Slippage Analysis"
     },
-    # Tier 3: $0.10 USDC (100,000 atomic units)
-    "^/v1/intel/whale-flow/.*$": {
-        "network": NETWORK,
-        "amount": "100000",
-        "payTo": RECEIVER,
+    # Tier 3: $0.10
+    "GET /v1/intel/whale-flow/*": {
+        "accepts": {
+            "scheme": "exact",
+            "payTo": RECEIVER,
+            "price": "$0.10",
+            "network": NETWORK,
+        },
         "description": "Tier 3: Whale Flow and Smart Money Accumulation"
     }
 }
