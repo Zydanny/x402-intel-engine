@@ -3,10 +3,11 @@ import time
 import httpx
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
+
 from cdp.x402 import create_facilitator_config
 from x402.server import x402ResourceServer
-from x402.http.facilitator_client import HTTPFacilitatorClient
-from x402.mechanisms.evm.exact import register_exact_evm_server
+from x402.http import HTTPFacilitatorClient
+from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.http.middleware.fastapi import PaymentMiddlewareASGI
 
 load_dotenv()
@@ -14,23 +15,15 @@ load_dotenv()
 RECEIVER = os.getenv("PAYMENT_RECEIVER_ADDRESS", "0x485F3043394Faa97a31987aA548EB24BB9C5Fb53")
 NETWORK = os.getenv("PAYMENT_NETWORK", "eip155:8453")
 
-CDP_KEY_ID = os.getenv("CDP_API_KEY_ID")
-CDP_KEY_SECRET = os.getenv("CDP_API_KEY_SECRET", "").replace("\\n", "\n")
-
 app = FastAPI(
     title="SuperZydan Agent Market Intelligence API",
     description="Multi-tier real-time market intelligence for autonomous agents via x402 micropayments on Base Mainnet.",
     version="1.0.0"
 )
 
-# Initialize Authenticated CDP Facilitator
-facilitator_config = create_facilitator_config(
-    api_key_id=CDP_KEY_ID,
-    api_key_secret=CDP_KEY_SECRET
-)
-facilitator_client = HTTPFacilitatorClient(facilitator_config)
-resource_server = x402ResourceServer(facilitator_client)
-register_exact_evm_server(resource_server)
+# 1. Initialize CDP Facilitator and Register EVM Scheme
+resource_server = x402ResourceServer(HTTPFacilitatorClient(create_facilitator_config()))
+resource_server.register(NETWORK, ExactEvmServerScheme())
 
 payment_routes = {
     # Tier 1: $0.02 USDC
