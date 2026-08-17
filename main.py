@@ -13,7 +13,7 @@ NETWORK = os.getenv("PAYMENT_NETWORK", "eip155:84532")
 FACILITATOR = os.getenv("FACILITATOR_URL", "https://x402.org/facilitator")
 
 app = FastAPI(
-    title="Autonomous Intel Engine API",
+    title="SuperZydan Agent Market Intelligence API",
     description="Multi-tier real-time market intelligence for autonomous agents via x402 micropayments on Base.",
     version="1.0.0"
 )
@@ -48,6 +48,32 @@ app.add_middleware(
     routes=payment_routes,
     facilitator_url=FACILITATOR
 )
+
+@app.get("/")
+def root():
+    return {
+        "engine": "SuperZydan Agent Market Intelligence API",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/health",
+        "tiers": {
+            "tier_1_pulse": {
+                "price_usd": 0.02,
+                "endpoint": "/v1/intel/pulse/{token}",
+                "description": "5m volume & momentum scoring"
+            },
+            "tier_2_orderbook": {
+                "price_usd": 0.05,
+                "endpoint": "/v1/intel/orderbook/{token}",
+                "description": "Liquidity depth imbalance & estimated slippage"
+            },
+            "tier_3_whale_flow": {
+                "price_usd": 0.10,
+                "endpoint": "/v1/intel/whale-flow/{token}",
+                "description": "Whale net flow & smart wallet accumulation clusters"
+            }
+        }
+    }
 
 @app.get("/health")
 def health_check():
