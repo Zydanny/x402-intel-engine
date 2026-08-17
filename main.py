@@ -18,28 +18,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure x402 payment requirements per tier
 payment_routes = {
     # Tier 1: $0.02 USDC (20,000 atomic units)
     "^/v1/intel/pulse/.*$": {
         "network": NETWORK,
         "amount": "20000",
         "payTo": RECEIVER,
-        "description": "Tier 1: 5m Momentum & Volume Pulse"
+        "description": "Tier 1: 5m Momentum and Volume Pulse"
     },
     # Tier 2: $0.05 USDC (50,000 atomic units)
     "^/v1/intel/orderbook/.*$": {
         "network": NETWORK,
         "amount": "50000",
         "payTo": RECEIVER,
-        "description": "Tier 2: Orderbook Depth & Slippage Analysis"
+        "description": "Tier 2: Orderbook Depth and Slippage Analysis"
     },
     # Tier 3: $0.10 USDC (100,000 atomic units)
     "^/v1/intel/whale-flow/.*$": {
         "network": NETWORK,
         "amount": "100000",
         "payTo": RECEIVER,
-        "description": "Tier 3: Whale Flow & Smart Money Accumulation"
+        "description": "Tier 3: Whale Flow and Smart Money Accumulation"
     }
 }
 
@@ -60,17 +59,17 @@ def root():
             "tier_1_pulse": {
                 "price_usd": 0.02,
                 "endpoint": "/v1/intel/pulse/{token}",
-                "description": "5m volume & momentum scoring"
+                "description": "5m volume and momentum scoring"
             },
             "tier_2_orderbook": {
                 "price_usd": 0.05,
                 "endpoint": "/v1/intel/orderbook/{token}",
-                "description": "Liquidity depth imbalance & estimated slippage"
+                "description": "Liquidity depth imbalance and estimated slippage"
             },
             "tier_3_whale_flow": {
                 "price_usd": 0.10,
                 "endpoint": "/v1/intel/whale-flow/{token}",
-                "description": "Whale net flow & smart wallet accumulation clusters"
+                "description": "Whale net flow and smart wallet accumulation clusters"
             }
         }
     }
