@@ -11,7 +11,7 @@ from x402.http.middleware.fastapi import PaymentMiddlewareASGI
 load_dotenv()
 
 RECEIVER = os.getenv("PAYMENT_RECEIVER_ADDRESS", "0x485F3043394Faa97a31987aA548EB24BB9C5Fb53")
-NETWORK = os.getenv("PAYMENT_NETWORK", "eip155:84532")
+NETWORK = os.getenv("PAYMENT_NETWORK", "eip155:8453")
 FACILITATOR = os.getenv("FACILITATOR_URL", "https://x402.org/facilitator")
 
 app = FastAPI(
