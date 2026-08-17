@@ -4,16 +4,16 @@ import httpx
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 
-from cdp.x402 import create_facilitator_config
 from x402.server import x402ResourceServer
-from x402.http import HTTPFacilitatorClient
-from x402.mechanisms.evm.exact import ExactEvmServerScheme
+from x402.http.facilitator_client import HTTPFacilitatorClient
+from x402.mechanisms.evm.exact import register_exact_evm_server
 from x402.http.middleware.fastapi import PaymentMiddlewareASGI
 
 load_dotenv()
 
 RECEIVER = os.getenv("PAYMENT_RECEIVER_ADDRESS", "0x485F3043394Faa97a31987aA548EB24BB9C5Fb53")
 NETWORK = os.getenv("PAYMENT_NETWORK", "eip155:8453")
+FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://api.cdp.coinbase.com/platform/v2/x402")
 
 app = FastAPI(
     title="SuperZydan Agent Market Intelligence API",
@@ -21,9 +21,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# 1. Initialize CDP Facilitator and Register EVM Scheme
-resource_server = x402ResourceServer(HTTPFacilitatorClient(create_facilitator_config()))
-resource_server.register(NETWORK, ExactEvmServerScheme())
+# Initialize Facilitator Client pointing to Coinbase CDP Base Mainnet
+try:
+    facilitator_client = HTTPFacilitatorClient({"url": FACILITATOR_URL})
+except Exception:
+    facilitator_client = HTTPFacilitatorClient(FACILITATOR_URL)
+
+resource_server = x402ResourceServer(facilitator_client)
+register_exact_evm_server(resource_server)
 
 payment_routes = {
     # Tier 1: $0.02 USDC
